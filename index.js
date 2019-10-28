@@ -53,35 +53,43 @@ server.get("/api/users/:id", (req, res) => {
     });
 });
 server.delete("/api/users/:id", (req, res) => {
-    const { id } = req.params;
-    db.remove(id)
-      .then(user => {
-        if (user) {
-          res.status(204).end();
-        } else {
-          res.status(404).json({ error: "Internal error, user not found" });
-        }
-      })
-      .catch(err => {
-        console.log(err);
-  
-        res.status(500).json({ error: "server error deleting" });
-      });
-  });
-  server.put("/api/users/:id", (req, res) => {
-    const { id } = req.params;
-    const { name, bio } = req.body;
-    if (!name && !bio) {
-      res.status(400).json({ error: "Error" });
-    }
-    db.update(id, { name, bio })
-      .then(updated => {
-        if (updated) {
-          db.findById(id)
-            .then(user => res.status(200).json(user))
-            .catch(err => {
-              console.log(err);
-              res.status(500).json({ error: `User with id ${id} not found` });
-            });
- 
+  const { id } = req.params;
+  db.remove(id)
+    .then(user => {
+      if (user) {
+        res.status(204).end();
+      } else {
+        res.status(404).json({ error: "Internal error, user not found" });
+      }
+    })
+    .catch(err => {
+      console.log(err);
+
+      res.status(500).json({ error: "server error deleting" });
+    });
+});
+server.put("/api/users/:id", (req, res) => {
+  const { id } = req.params;
+  const { name, bio } = req.body;
+  if (!name && !bio) {
+    res.status(400).json({ error: "Error" });
+  }
+  db.update(id, { name, bio })
+    .then(updated => {
+      if (updated) {
+        db.findById(id)
+          .then(user => res.status(200).json(user))
+          .catch(err => {
+            console.log(err);
+            res.status(500).json({ error: `User with id ${id} not found` });
+          });
+      } else {
+        res.status(404).json({ error: `User with id ${id} not found` });
+      }
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(500).json({ error: "Error updating user" });
+    });
+});
 server.listen(8000, () => console.log("server is running :)"));
