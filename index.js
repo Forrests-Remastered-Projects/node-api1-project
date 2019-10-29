@@ -57,7 +57,7 @@ server.delete("/api/users/:id", (req, res) => {
   db.remove(id)
     .then(user => {
       if (user) {
-        res.status(204).end();
+        res.status(200).json({ message: "User was deleted" });
       } else {
         res.status(404).json({ error: "Internal error, user not found" });
       }
@@ -72,20 +72,22 @@ server.put("/api/users/:id", (req, res) => {
   const { id } = req.params;
   const { name, bio } = req.body;
   if (!name && !bio) {
-    res.status(400).json({ error: "Error" });
+    res.status(400).json({ error: "You must enter a name and bio" });
   }
   db.update(id, { name, bio })
     .then(updated => {
-      if (updated) {
-        db.findById(id)
-          .then(user => res.status(200).json(user))
-          .catch(err => {
-            console.log(err);
-            res.status(500).json({ error: `User with id ${id} not found` });
-          });
-      } else {
-        res.status(404).json({ error: `User with id ${id} not found` });
-      }
+      return res.status(200).json(updated);
+
+      //   if (updated) {
+      //     db.findById(id)
+      //       .then(user => res.status(200).json(user))
+      //       .catch(err => {
+      //         console.log(err);
+      //         res.status(404).json({ error: `User with id ${id} not found` });
+      //       });
+      //   } else {
+      //     res.status(404).json({ error: `User with id ${id} not found` });
+      //   }
     })
     .catch(err => {
       console.log(err);
